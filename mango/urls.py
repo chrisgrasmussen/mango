@@ -20,6 +20,7 @@ from start import views
 from start.views import MyTokenObtainPairView
 from rest_framework.urlpatterns import format_suffix_patterns
 from complete import views as complete_views
+from user.views import RegisterView
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -36,6 +37,9 @@ urlpatterns = [
     
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    path('api/register/', RegisterView.as_view()),
+    
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
