@@ -1,14 +1,22 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
-from rest_framework import status
+from django.contrib.auth.models import User
 from .serializers import UserSerializer
 
 class RegisterView(generics.CreateAPIView):
+    permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        # Generate JWT token
+        from rest_framework_simplejwt.tokens import RefreshToken
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })
